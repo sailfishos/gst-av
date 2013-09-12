@@ -6,8 +6,6 @@ License:        LGPL-2.1
 Group:          Productivity/Multimedia/Video/Players
 Url:            http://code.google.com/p/gst-av/
 Source:         gst-av-%{version}.tar.xz
-Patch0:         0001-don-t-register-avh263enc-and-avh264enc.patch
-Patch1:         0002-only-enable-theora-video-decoding.patch
 BuildRequires:  gstreamer-devel
 BuildRequires:  libav-devel
 BuildRequires:  pkgconfig(gstreamer-tag-0.10)
@@ -18,9 +16,6 @@ This package contains the GStreamer plug-in to access libav
 
 %prep
 %setup -q
-
-%patch0 -p1
-%patch1 -p1
 
 %build
 make
