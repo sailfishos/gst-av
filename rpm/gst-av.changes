@@ -1,0 +1,7 @@
+* Thu Aug 15 2013 Mohammed Hassan <mohammed.hassan@jollamobile.com> - 0.8.1
+- Updated to 0.8.1
+- Added 0001-don-t-register-avh263enc-and-avh264enc.patch
+- Added 0002-only-enable-theora-video-decoding.patch
+
+* Wed Nov 14 2012 <carsten.munk@jollamobile.com> - 0.7.0
+- Initial import of 0.7.0
