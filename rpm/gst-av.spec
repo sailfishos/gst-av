@@ -5,7 +5,7 @@ Summary:        GStreamer plug-in to access libav
 License:        LGPL-2.1
 Group:          Productivity/Multimedia/Video/Players
 Url:            http://code.google.com/p/gst-av/
-Source:         gst-av-%{version}.tar.xz
+Source:         gst-av-%{version}.tar.gz
 BuildRequires:  gstreamer-devel
 BuildRequires:  libav-devel
 BuildRequires:  pkgconfig(gstreamer-tag-0.10)
