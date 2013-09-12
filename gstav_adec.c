@@ -419,7 +419,10 @@ sink_event(GstPad *pad, GstEvent *event)
 	case GST_EVENT_FLUSH_START:
 		self->timestamp = GST_CLOCK_TIME_NONE;
 		g_mutex_lock(&self->mutex);
-		avcodec_flush_buffers(self->av_ctx);
+		if (self->av_ctx) {
+		  avcodec_flush_buffers(self->av_ctx);
+		}
+
 		g_mutex_unlock(&self->mutex);
 		break;
 	case GST_EVENT_EOS: {
