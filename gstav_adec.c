@@ -282,6 +282,10 @@ pad_chain(GstPad *pad, GstBuffer *buf)
 			int read;
 			unsigned total_buffer_size;
 
+			if (!self->buffer_data) {
+			  self->buffer_data = av_malloc(self->buffer_size);
+			}
+
 			buffer_data = self->buffer_data + self->ring.in;
 			buffer_size = self->buffer_size - self->ring.in;
 #if LIBAVCODEC_VERSION_MAJOR < 54 && !(LIBAVCODEC_VERSION_MAJOR == 53 && LIBAVCODEC_VERSION_MINOR >= 25)
@@ -377,7 +381,7 @@ change_state(GstElement *element, GstStateChange transition)
 		self->got_header = false;
 		av_new_packet(&self->pkt, AVCODEC_MAX_AUDIO_FRAME_SIZE);
 		self->buffer_size = 3 * AVCODEC_MAX_AUDIO_FRAME_SIZE;
-		self->buffer_data = av_malloc(self->buffer_size);
+		self->buffer_data = NULL;
 		break;
 
 	default:
@@ -398,7 +402,11 @@ change_state(GstElement *element, GstStateChange transition)
 			self->av_ctx = NULL;
 		}
 		av_free_packet(&self->pkt);
-		av_freep(&self->buffer_data);
+		if (self->buffer_data) {
+		  av_freep(&self->buffer_data);
+		  self->buffer_data = NULL;
+		}
+
 		break;
 
 	default:
