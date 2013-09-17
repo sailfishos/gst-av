@@ -439,6 +439,10 @@ sink_event(GstPad *pad, GstEvent *event)
 		GstBuffer *out_buf;
 		GstFlowReturn r;
 
+		if (!self->buffer_data) {
+		  break;
+		}
+
 		out_buf = gst_buffer_new_and_alloc(self->ring.in - self->ring.out);
 		memcpy(out_buf->data, self->buffer_data + self->ring.out, out_buf->size);
 		calculate_timestamp(self, out_buf);
