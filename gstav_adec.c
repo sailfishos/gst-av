@@ -395,6 +395,7 @@ change_state(GstElement *element, GstStateChange transition)
 			gst_av_codec_close(self->av_ctx);
 			av_freep(&self->av_ctx->extradata);
 			av_freep(&self->av_ctx);
+			self->av_ctx = NULL;
 		}
 		av_free_packet(&self->pkt);
 		av_freep(&self->buffer_data);
