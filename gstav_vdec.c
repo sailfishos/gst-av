@@ -229,19 +229,21 @@ pad_chain(GstPad *pad, GstBuffer *buf)
 
 	g_mutex_lock(&self->mutex);
 	read = avcodec_decode_video2(ctx, frame, &got_pic, &pkt);
-	g_mutex_unlock(&self->mutex);
 	av_free_packet(&pkt);
 	if (read < 0) {
 		GST_WARNING_OBJECT(self, "error: %i", read);
+		g_mutex_unlock(&self->mutex);
 		goto leave;
 	}
 
 	if (got_pic) {
 		GstBuffer *out_buf;
 		out_buf = convert_frame(self, frame);
+		g_mutex_unlock(&self->mutex);
 		ret = gst_pad_push(self->srcpad, out_buf);
 	}
-
+	else
+	  g_mutex_unlock(&self->mutex);
 leave:
 	av_free(frame);
 	gst_buffer_unref(buf);
