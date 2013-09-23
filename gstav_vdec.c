@@ -171,6 +171,7 @@ pad_chain(GstPad *pad, GstBuffer *buf)
 	int read;
 
 	self = (struct obj *)((GstObject *)pad)->parent;
+	GST_DEBUG_OBJECT (self, "pad chain");
 	ctx = self->av_ctx;
 
 	if (G_UNLIKELY(!self->initialized)) {
@@ -244,7 +245,7 @@ pad_chain(GstPad *pad, GstBuffer *buf)
 leave:
 	av_free(frame);
 	gst_buffer_unref(buf);
-
+	GST_DEBUG_OBJECT (self, "pad chain returning %s", gst_flow_get_name (ret));
 	return ret;
 }
 
@@ -255,6 +256,10 @@ change_state(GstElement *element, GstStateChange transition)
 	struct obj *self;
 
 	self = (struct obj *)element;
+
+	GST_DEBUG_OBJECT (self, "State change: %s -> %s",
+			  gst_element_state_get_name (GST_STATE_TRANSITION_CURRENT (transition)),
+			  gst_element_state_get_name (GST_STATE_TRANSITION_NEXT (transition)));
 
 	switch (transition) {
 	case GST_STATE_CHANGE_NULL_TO_READY:
@@ -282,6 +287,9 @@ change_state(GstElement *element, GstStateChange transition)
 	default:
 		break;
 	}
+
+	GST_DEBUG_OBJECT (self, "State_change return: %s",
+			  gst_element_state_change_return_get_name (ret));
 
 	return ret;
 }
@@ -585,6 +593,8 @@ static gboolean sink_event(GstPad *pad, GstEvent *event)
 
 	self = (struct obj *)(gst_pad_get_parent(pad));
 
+	GST_DEBUG_OBJECT (self, "sink event %"GST_PTR_FORMAT, event);
+
 	switch (GST_EVENT_TYPE(event)) {
 	case GST_EVENT_EOS:
 		get_delayed(self);
@@ -601,6 +611,8 @@ static gboolean sink_event(GstPad *pad, GstEvent *event)
 	ret = gst_pad_push_event(self->srcpad, event);
 
 	gst_object_unref(self);
+
+	GST_DEBUG_OBJECT (self, "sink event returning %d", ret);
 
 	return ret;
 }
