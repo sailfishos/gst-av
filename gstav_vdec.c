@@ -591,9 +591,7 @@ static gboolean sink_event(GstPad *pad, GstEvent *event)
 		break;
 	case GST_EVENT_FLUSH_START:
 		g_mutex_lock(&self->mutex);
-		GST_PAD_STREAM_LOCK (self->sinkpad);
 		avcodec_flush_buffers(self->av_ctx);
-		GST_PAD_STREAM_UNLOCK (self->sinkpad);
 		g_mutex_unlock(&self->mutex);
 		break;
 	default:
