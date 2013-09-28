@@ -209,8 +209,6 @@ pad_chain(GstPad *pad, GstBuffer *buf)
 	if (G_UNLIKELY(!self->got_header)) {
 		int hdr = self->header_func(self, buf);
 		if (!hdr) {
-			GstCaps *new_caps;
-			GstStructure *s;
 			int bps;
 
 			self->got_header = true;
@@ -228,36 +226,6 @@ pad_chain(GstPad *pad, GstBuffer *buf)
 #endif
 
 			self->bps = bps;
-
-			s = gst_structure_new("audio/x-raw-int",
-					"rate", G_TYPE_INT, av_ctx->sample_rate,
-					"channels", G_TYPE_INT, av_ctx->channels,
-					"endianness", G_TYPE_INT, G_BYTE_ORDER,
-					"width", G_TYPE_INT, bps,
-					NULL);
-
-			switch (av_ctx->sample_fmt) {
-#if LIBAVCODEC_VERSION_MAJOR < 54
-			case SAMPLE_FMT_S16:
-			case SAMPLE_FMT_S32:
-#else
-			case AV_SAMPLE_FMT_S16:
-			case AV_SAMPLE_FMT_S32:
-#endif
-				gst_structure_set(s,
-						"signed", G_TYPE_BOOLEAN, TRUE,
-						"depth", G_TYPE_INT, bps,
-						NULL);
-				break;
-			default:
-				break;
-			}
-
-			new_caps = gst_caps_new_full(s, NULL);
-
-			GST_INFO_OBJECT(self, "caps are: %" GST_PTR_FORMAT, new_caps);
-			gst_pad_set_caps(self->srcpad, new_caps);
-			gst_caps_unref(new_caps);
 		}
 	}
 
@@ -348,6 +316,40 @@ pad_chain(GstPad *pad, GstBuffer *buf)
 				out_buf = gst_buffer_new_and_alloc(total_buffer_size);
 				memcpy(out_buf->data, self->buffer_data + self->ring.out, out_buf->size);
 				calculate_timestamp(self, out_buf);
+				if (!self->srcpad->caps) {
+				  GstStructure *s;
+				  GstCaps *new_caps;
+				  s = gst_structure_new("audio/x-raw-int",
+					          "rate", G_TYPE_INT, av_ctx->sample_rate,
+					          "channels", G_TYPE_INT, av_ctx->channels,
+					          "endianness", G_TYPE_INT, G_BYTE_ORDER,
+					          "width", G_TYPE_INT, self->bps,
+					          NULL);
+
+				  switch (av_ctx->sample_fmt) {
+#if LIBAVCODEC_VERSION_MAJOR < 54
+				  case SAMPLE_FMT_S16:
+				  case SAMPLE_FMT_S32:
+#else
+				  case AV_SAMPLE_FMT_S16:
+				  case AV_SAMPLE_FMT_S32:
+#endif
+				    gst_structure_set(s,
+						    "signed", G_TYPE_BOOLEAN, TRUE,
+						    "depth", G_TYPE_INT, self->bps,
+						    NULL);
+				    break;
+				  default:
+				    break;
+				  }
+
+				  new_caps = gst_caps_new_full(s, NULL);
+
+				  GST_INFO_OBJECT(self, "caps are: %" GST_PTR_FORMAT, new_caps);
+				  gst_pad_set_caps(self->srcpad, new_caps);
+				  gst_caps_unref(new_caps);
+				}
+
 				gst_buffer_set_caps(out_buf, self->srcpad->caps);
 
 				self->ring.out += out_buf->size;
