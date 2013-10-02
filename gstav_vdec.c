@@ -510,7 +510,7 @@ generate_sink_template(void)
 	GstStructure *struc;
 
 	caps = gst_caps_new_empty();
-#if 0
+
 	struc = gst_structure_new("video/x-h263",
 			NULL);
 
@@ -551,7 +551,6 @@ generate_sink_template(void)
 			NULL);
 
 	gst_caps_append_structure(caps, struc);
-#endif
 
 	struc = gst_structure_new("video/x-theora",
 			NULL);
