@@ -354,6 +354,11 @@ pad_chain(GstPad *pad, GstBuffer *buf)
 
 				self->ring.out += out_buf->size;
 
+				GST_LOG_OBJECT (self, "pushing buffer ts %" GST_TIME_FORMAT
+				    ", duration %" GST_TIME_FORMAT,
+				    GST_TIME_ARGS (GST_BUFFER_TIMESTAMP (out_buf)),
+				    GST_TIME_ARGS (GST_BUFFER_DURATION (out_buf)));
+
 				ret = gst_pad_push(self->srcpad, out_buf);
 			}
 #if LIBAVCODEC_VERSION_MAJOR >= 54 || (LIBAVCODEC_VERSION_MAJOR == 53 && LIBAVCODEC_VERSION_MINOR >= 25)
