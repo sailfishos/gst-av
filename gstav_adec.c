@@ -443,6 +443,11 @@ sink_event(GstPad *pad, GstEvent *event)
 
 		g_mutex_unlock(&self->mutex);
 		break;
+
+	case GST_EVENT_FLUSH_STOP:
+		self->ring.in = self->ring.out = 0;
+		break;
+
 	case GST_EVENT_EOS: {
 		/* flush current buffer */
 		GstBuffer *out_buf;
