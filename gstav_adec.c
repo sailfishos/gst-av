@@ -184,6 +184,8 @@ calculate_timestamp(struct obj *self, GstBuffer *out_buf)
 static void
 check_timestamps(struct obj *self, GstBuffer *buf)
 {
+        GST_LOG_OBJECT (self, "self timestamp = %" GST_TIME_FORMAT, GST_TIME_ARGS (self->timestamp));
+
 	if (G_UNLIKELY(self->timestamp == GST_CLOCK_TIME_NONE)) {
 		self->next_timestamp = self->timestamp = buf->timestamp;
 	} else if (abs(buf->timestamp - self->next_timestamp) > MAX_DIFF) {
@@ -466,6 +468,8 @@ sink_event(GstPad *pad, GstEvent *event)
 		break;
 	}
 
+	GST_DEBUG_OBJECT (self, "pushing event %"GST_PTR_FORMAT, event);
+
 	ret = gst_pad_push_event(self->srcpad, event);
 
 leave:
@@ -486,6 +490,8 @@ sink_setcaps(GstPad *pad, GstCaps *caps)
 	GstBuffer *buf;
 
 	self = (struct obj *)((GstObject *)pad)->parent;
+
+	GST_DEBUG_OBJECT (self, "setcaps %"GST_PTR_FORMAT, caps);
 
 	in_struc = gst_caps_get_structure(caps, 0);
 
