@@ -50,6 +50,8 @@ struct obj {
 	int (*header_func)(struct obj *self, GstBuffer *buf);
 	uint64_t next_timestamp;
 	int bps;
+	int sample_rate;
+	int channels;
 	GMutex mutex;
 };
 
@@ -228,6 +230,8 @@ pad_chain(GstPad *pad, GstBuffer *buf)
 #endif
 
 			self->bps = bps;
+			self->sample_rate = self->av_ctx->sample_rate;
+			self->channels = self->av_ctx->channels;
 		}
 	}
 
@@ -318,7 +322,9 @@ pad_chain(GstPad *pad, GstBuffer *buf)
 				out_buf = gst_buffer_new_and_alloc(total_buffer_size);
 				memcpy(out_buf->data, self->buffer_data + self->ring.out, out_buf->size);
 				calculate_timestamp(self, out_buf);
-				if (!self->srcpad->caps) {
+				if (!self->srcpad->caps
+					|| self->sample_rate != self->av_ctx->sample_rate
+					|| self->channels != self->av_ctx->channels) {
 				  GstStructure *s;
 				  GstCaps *new_caps;
 				  s = gst_structure_new("audio/x-raw-int",
@@ -345,6 +351,8 @@ pad_chain(GstPad *pad, GstBuffer *buf)
 				    break;
 				  }
 
+				  self->sample_rate = self->av_ctx->sample_rate;
+				  self->channels = self->av_ctx->channels;
 				  new_caps = gst_caps_new_full(s, NULL);
 
 				  GST_INFO_OBJECT(self, "caps are: %" GST_PTR_FORMAT, new_caps);
