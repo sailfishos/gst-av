@@ -190,7 +190,8 @@ check_timestamps(struct obj *self, GstBuffer *buf)
 
 	if (G_UNLIKELY(self->timestamp == GST_CLOCK_TIME_NONE)) {
 		self->next_timestamp = self->timestamp = buf->timestamp;
-	} else if (abs(buf->timestamp - self->next_timestamp) > MAX_DIFF) {
+    } else if (buf->timestamp != GST_CLOCK_TIME_NONE
+            && abs(buf->timestamp - self->next_timestamp) > MAX_DIFF) {
 		int64_t progress = self->next_timestamp - self->timestamp;
 
 		GST_DEBUG_OBJECT(self, "reseting timestamp: %li ns",
